@@ -5,12 +5,38 @@
 
 // Dependencies
 const http = require('http');
+const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
+const fs = require('fs');
 
-// The server should respond to all requests with as tring
-const server = http.createServer(function(req, res){
+// Instantiate http server
+const httpServer = http.createServer(function(req, res){
+    unifiedServer(req, res);
+});
+
+// Start server and listen on port exported from config
+httpServer.listen(config.httpPort, function(){
+    console.log(`Listening on port http://localhost:${config.httpPort}`);
+});
+
+// Instantiate https server
+const httpsServerOptions = {
+    key: fs.readFileSync('./https/key.pem'),
+    cert: fs.readFileSync('./https/cert.pem')
+};
+const httpsServer = https.createServer(httpsServerOptions, function(req, res){
+    unifiedServer(req, res);
+});
+
+// Start server and listen on secure port exported from config
+httpsServer.listen(config.httpsPort, function(){
+    console.log(`Listening on port http://localhost:${config.httpsPort}`);
+});
+
+// Server login for http and https servers
+const unifiedServer = function(req, res){
     // Get the url
     const parsedUrl = url.parse(req.url, true); // True to indicate query string parsing inclusive
     
@@ -68,12 +94,7 @@ const server = http.createServer(function(req, res){
         });
 
     });
-})
-
-// Start server and listen on port exported from config
-server.listen(config.port, function(){
-    console.log(`Listening on port http://localhost:${config.port} and env name is ${config.envName}`);
-});
+}
 
 // Define Handlers
 const handlers = {
