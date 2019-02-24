@@ -7,6 +7,7 @@
 const http = require('http');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+const config = require('./config');
 
 // The server should respond to all requests with as tring
 const server = http.createServer(function(req, res){
@@ -58,6 +59,7 @@ const server = http.createServer(function(req, res){
             payloadString = JSON.stringify(payload);
 
             // Send a response
+            res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
             res.end(payloadString);
 
@@ -68,9 +70,9 @@ const server = http.createServer(function(req, res){
     });
 })
 
-// Start server and listen on port 3000
-server.listen(3000, function(){
-    console.log('Listening on port http://localhost:3000');
+// Start server and listen on port exported from config
+server.listen(config.port, function(){
+    console.log(`Listening on port http://localhost:${config.port} and env name is ${config.envName}`);
 });
 
 // Define Handlers
