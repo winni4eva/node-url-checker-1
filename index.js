@@ -35,12 +35,36 @@ const server = http.createServer(function(req, res){
     req.on('end', function(){
         buffer += decoder.end();
 
-        // Send a response
-        res.end('Hello World!');
+        // Choose the handler this request should go to. If one is not found the not found handler would be called
+        const chosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
 
-        // Log the request path & headers
-        // console.log(`Request was recieved on path ${trimmedPath} with method: ${method} and query string params`, queryStringObject);
-        console.log('Request payload', buffer);
+        const data = {
+            trimmedPath,
+            method,
+            headers,
+            queryStringObject,
+            payload: buffer
+        };
+
+        // Route the request to the router specified in the callback
+        chosenHandler(data, function(statusCode, payload){
+            // Use the status code defined by the handler or default to 200
+            statusCode = typeof(statusCode) === 'number' ? statusCode : 200; 
+
+            // Use the payload returned by our handler or default to an empty object
+            payload = typeof(payload) === 'object' ? payload : {};
+
+            // Convert payload to a string
+            payloadString = JSON.stringify(payload);
+
+            // Send a response
+            res.writeHead(statusCode);
+            res.end(payloadString);
+
+            // Log the request path & headers
+            console.log('Response payload', payloadString, statusCode);
+        });
+
     });
 })
 
@@ -48,3 +72,18 @@ const server = http.createServer(function(req, res){
 server.listen(3000, function(){
     console.log('Listening on port http://localhost:3000');
 });
+
+// Define Handlers
+const handlers = {
+    sample: function(data, callback){
+        callback(406, {name: 'Sample handler'});
+    }, // Sample request handler
+    notFound: function(data, callback){
+        callback(404);
+    }, // Not found request handler 
+};
+
+// Define a request router
+const router = {
+    sample: handlers.sample
+};
