@@ -10,6 +10,7 @@ const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
 const fs = require('fs');
+const _data = require('./lib/data');
 
 // Instantiate http server
 const httpServer = http.createServer(function(req, res){
@@ -98,9 +99,9 @@ const unifiedServer = function(req, res){
 
 // Define Handlers
 const handlers = {
-    sample: function(data, callback){
-        callback(406, {name: 'Sample handler'});
-    }, // Sample request handler
+    ping: function(data, callback){
+        callback(200);
+    }, // Ping request handler
     notFound: function(data, callback){
         callback(404);
     }, // Not found request handler 
@@ -108,5 +109,16 @@ const handlers = {
 
 // Define a request router
 const router = {
-    sample: handlers.sample
+    ping: handlers.ping,
 };
+
+// Testing File Create @Delete
+// _data.create('test','newFile', {adam: "winni"}, function(err){
+//     console.log(err);
+// });
+
+// Testing File Read @Delete
+// _data.read('test','newFile', function(err, data){
+//     console.log(err);
+//     console.log(data);
+// });
