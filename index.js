@@ -122,3 +122,13 @@ const router = {
 //     console.log(err);
 //     console.log(data);
 // });
+
+// Testing File Update @Delete
+// _data.update('test','newFile', {node: "guru"}, function(err){
+//     console.log(err);
+// });
+
+// Testing File Delete @Delete
+// _data.delete('test','newFile', function(err){
+//     console.log(err);
+// });
