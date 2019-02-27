@@ -8,9 +8,10 @@ const http = require('http');
 const https = require('https');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
-const config = require('./config');
+const config = require('./lib/config');
 const fs = require('fs');
 const handlers = require('./lib/handlers');
+const helpers = require('./lib/helpers');
 
 
 // Instantiate http server
@@ -34,7 +35,7 @@ const httpsServer = https.createServer(httpsServerOptions, function(req, res){
 
 // Start server and listen on secure port exported from config
 httpsServer.listen(config.httpsPort, function(){
-    console.log(`Listening on port http://localhost:${config.httpsPort}`);
+    console.log(`Listening on port https://localhost:${config.httpsPort}`);
 });
 
 // Server login for http and https servers
@@ -72,7 +73,7 @@ const unifiedServer = function(req, res){
             method,
             headers,
             queryStringObject,
-            payload: buffer
+            payload: helpers.parseJsonToObject(buffer)
         };
 
         // Route the request to the router specified in the callback
@@ -87,12 +88,13 @@ const unifiedServer = function(req, res){
             payloadString = JSON.stringify(payload);
 
             // Send a response
+            console.log('Sending A Response');
+            console.log(payloadString);
             res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
             res.end(payloadString);
-
             // Log the request path & headers
-            console.log('Response payload', payloadString, statusCode);
+            // console.log('Response payload', payloadString, statusCode);
         });
 
     });
